@@ -88,8 +88,8 @@ def _http_request(url):
 @plugin.route('/dr')
 def dr():
     servicing = 'special://profile/addon_data/plugin.video.dr.strms/servicing'
-    if xbmcvfs.exists(servicing):
-        return
+    #if xbmcvfs.exists(servicing):
+    #    return
     f = xbmcvfs.File(servicing,'wb')
     #f.write('')
     f.close()
@@ -105,16 +105,17 @@ def dr():
             #log((program['SeriesTitle'],program['PrimaryImageUri'],program['SeriesSlug']))
             title = program['SeriesTitle']
             #log((title,type(title)))
-            seriesTitle = urllib.quote(title.encode("utf8"))
+            seriesTitle = urllib.quote(title.encode("utf8")).replace('%20',' ')
             dir = '%s%s/' % (folder,seriesTitle)
             xbmcvfs.mkdirs(dir)
             f = xbmcvfs.File(dir+'tvshow.nfo','wb')
-            xml ='''
+            xml ='''<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
             <tvshow>
                    <title>%s</title>
+                   <showtitle>%s</showtitle>
                    <thumb aspect="banner">%s</thumb>
             </tvshow>
-            ''' % (title,program['PrimaryImageUri'])
+            ''' % (title,title,program['PrimaryImageUri'])
             f.write(xml.encode("utf8"))
             f.close()
             programEpisodes = _http_request('http://www.dr.dk/mu-online/api/1.2/list/%s' % program['SeriesSlug'])
@@ -139,18 +140,21 @@ def dr():
                         break
                 #log(uri)
                 episodeTitle = "%s - %s" % (program['Title'],program.get('Subtitle',str(i)))
+                filename = "S1E%d" % i
                 i += 1
-                f = xbmcvfs.File(dir+urllib.quote(episodeTitle.encode("utf8"))+'.nfo','wb')
-                xml ='''
+                f = xbmcvfs.File(dir+filename+'.nfo','wb')
+                xml ='''<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
                 <episodedetails>
                        <title>%s</title>
                        <thumb aspect="banner">%s</thumb>
+                       <season>1</season>
+                       <episode>%d</episode>
                        <plot>%s</plot>
                 </episodedetails>
-                ''' % (episodeTitle,program['PrimaryImageUri'],episodeDetails.get('Description'))
+                ''' % (episodeTitle,program['PrimaryImageUri'],i,episodeDetails.get('Description'))
                 f.write(xml.encode("utf8"))
                 f.close()
-                f = xbmcvfs.File(dir+urllib.quote(episodeTitle.encode("utf8"))+'.strm','wb')
+                f = xbmcvfs.File(dir+filename+'.strm','wb')
                 f.write(uri.encode("utf8"))
                 f.close()
             #return
@@ -174,7 +178,20 @@ def index():
         'thumbnail':get_icon_path('settings'),
         'context_menu': context_items,
     })
-
+    items.append(
+    {
+        'label': " strms",
+        'path': 'special://profile/addon_data/plugin.video.dr.strms/TV/',
+        'thumbnail':get_icon_path('tv'),
+        'context_menu': context_items,
+    })
+    items.append(
+    {
+        'label': "Library TV Shows",
+        'path': 'library://video/tvshows/titles.xml/',
+        'thumbnail':get_icon_path('tv'),
+        'context_menu': context_items,
+    })
     return items
 
 if __name__ == '__main__':

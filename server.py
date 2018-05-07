@@ -19,6 +19,8 @@ def Service():
 if __name__ == '__main__':
     ADDON = xbmcaddon.Addon('plugin.video.dr.strms')
 
+    xbmcvfs.delete('special://profile/addon_data/plugin.video.dr.strms/servicing')
+
     try:
         if ADDON.getSetting('service') == 'true':
             monitor = xbmc.Monitor()
@@ -40,7 +42,9 @@ if __name__ == '__main__':
                 elif ADDON.getSetting('service.type') == '2':
                     next_time = ADDON.getSetting('service.time')
                     if next_time:
-                        hour,minute = next_time.split(':')
+                        hms = next_time.split(':')
+                        hour = hms[0]
+                        minute = hms[1]
                         now = datetime.datetime.now()
                         next_time = now.replace(hour=int(hour),minute=int(minute),second=0,microsecond=0)
                         if next_time < now:
@@ -60,4 +64,3 @@ if __name__ == '__main__':
     except:
         pass
 
-        
