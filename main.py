@@ -106,9 +106,10 @@ def dr():
             title = program['SeriesTitle']
             #log((title,type(title)))
             seriesTitle = urllib.quote(title.encode("utf8")).replace('%20',' ')
-            dir = '%s%s/' % (folder,seriesTitle)
+            dir = '%s%s/' % (folder,program['SeriesSlug'])
             xbmcvfs.mkdirs(dir)
             f = xbmcvfs.File(dir+'tvshow.nfo','wb')
+            xbmcvfs.copy(program['PrimaryImageUri'],dir+'poster.jpg')
             xml ='''<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
             <tvshow>
                    <title>%s</title>
