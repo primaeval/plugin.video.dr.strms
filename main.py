@@ -167,6 +167,29 @@ def dr():
     #xbmcvfs.rename(new_folder,tv_folder)
     #delete(old_folder)
 
+@plugin.route('/live')
+def live():
+    links = [
+        [ "DR 1", 'http://dr01-lh.akamaihd.net/i/live/dr01_0@147054/index_3000_av-p.m3u8','http://www.dr.dk/mu/Asset?Id=52d3f40f6187a2077cbac703'],
+        [ "DR 2", 'http://dr02-lh.akamaihd.net/i/live/dr02_0@147055/index_3000_av-p.m3u8','http://www.dr.dk/mu/Asset?Id=52d3f5e66187a2077cbac70c'],
+        [ "DR 3", 'http://dr03-lh.akamaihd.net/i/live/dr03_0@147056/index_3000_av-p.m3u8','http://www.dr.dk/mu/Asset?Id=52d3f60da11f9d0f50f56fd3'],
+        [ "DR Ultra", 'http://dr06-lh.akamaihd.net/i/live/dr06_0@147059/index_3000_av-p.m3u8','http://www.dr.dk/mu/bar/52d3f6c6a11f9d0f50f56fde'],
+        [ "DR K", 'http://dr04-lh.akamaihd.net/i/live/dr04_0@147057/index_3000_av-p.m3u8','http://www.dr.dk/mu/Asset?Id=52d3f685a11f9d0f50f56fd6'],
+        [ "DR Ramasjang", 'http://dr05-lh.akamaihd.net/i/live/dr05_0@147058/index_3000_av-p.m3u8','http://www.dr.dk/mu/bar/52d3f6aca11f9d0f50f56fdb']
+    ]
+
+    items = []
+
+    for name,url,thumbnail in links:
+        items.append(
+        {
+            'label': name,
+            'path': url,
+            'thumbnail': thumbnail,
+            'is_playable': True
+        })
+    return items
+
 @plugin.route('/')
 def index():
     items = []
@@ -174,14 +197,22 @@ def index():
 
     items.append(
     {
-        'label': "Make DR Ultra and Ramasjang strms in addon_data folder",
+        'label': "Live",
+        'path': plugin.url_for('live'),
+        'thumbnail':get_icon_path('tv'),
+        'context_menu': context_items,
+    })
+
+    items.append(
+    {
+        'label': "Update DR Ultra and Ramasjang strms",
         'path': plugin.url_for('service'),
         'thumbnail':get_icon_path('settings'),
         'context_menu': context_items,
     })
     items.append(
     {
-        'label': " strms",
+        'label': "strms Folder",
         'path': 'special://profile/addon_data/plugin.video.dr.strms/TV/',
         'thumbnail':get_icon_path('tv'),
         'context_menu': context_items,
